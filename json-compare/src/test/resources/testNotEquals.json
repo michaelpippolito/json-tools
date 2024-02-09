@@ -1,0 +1,26 @@
+{
+  "string": "x",
+  "boolean": false,
+  "null": null,
+  "extra": "extra",
+  "emptyArray": [],
+  "primitiveArray": [
+    "string",
+    true,
+    2,
+    null
+  ],
+  "object": {
+    "boolean": true,
+    "extra": "extra",
+    "number": 2,
+    "null": null,
+    "emptyArray": [],
+    "primitiveArray": [
+      "string",
+      true,
+      1,
+      null
+    ]
+  }
+}
