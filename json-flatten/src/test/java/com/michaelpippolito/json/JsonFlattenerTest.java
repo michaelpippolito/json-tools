@@ -1,7 +1,6 @@
-package com.michaelpippolit.json;
+package com.michaelpippolito.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.michaelpippolito.json.JsonFlattener;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
