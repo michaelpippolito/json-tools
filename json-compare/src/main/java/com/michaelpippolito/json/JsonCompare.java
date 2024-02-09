@@ -18,8 +18,8 @@ public class JsonCompare {
 
         Set<String> matchedFields = new LinkedHashSet<>();
         Map<String, JsonMismatch> mismatchedFields = new LinkedHashMap<>();
-        Set<String> missingFields = new LinkedHashSet<>();
-        Set<String> extraFields = new LinkedHashSet<>();
+        Map<String, String> missingFields = new LinkedHashMap<>();
+        Map<String, String> extraFields = new LinkedHashMap<>();
 
         flattenedExpectedJson.forEach((expectedKey, expectedValue) -> {
             if (flattenedActualJson.containsKey(expectedKey)) {
@@ -37,13 +37,13 @@ public class JsonCompare {
                     mismatchedFields.put(expectedKey, new JsonMismatch(expectedValue, actualValue));
                 }
             } else {
-                missingFields.add(expectedKey);
+                missingFields.put(expectedKey, expectedValue);
             }
         });
 
-        flattenedActualJson.keySet().forEach(actualKey -> {
+        flattenedActualJson.forEach((actualKey, actualValue) -> {
             if (!matchedFields.contains(actualKey) && !mismatchedFields.containsKey(actualKey)) {
-                extraFields.add(actualKey);
+                extraFields.put(actualKey, actualValue);
             }
         });
 

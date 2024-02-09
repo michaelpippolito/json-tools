@@ -52,10 +52,10 @@ public class JsonCompareTest {
         assertEquals("1", result.getMismatchedFields().get("object_number").expectedValue());
         assertEquals("2", result.getMismatchedFields().get("object_number").actualValue());
 
-        assertTrue(result.getMissingFields().contains("number"));
-        assertTrue(result.getMissingFields().contains("object_string"));
+        assertTrue(result.getMissingFields().containsKey("number"));
+        assertTrue(result.getMissingFields().containsKey("object_string"));
 
-        assertTrue(result.getExtraFields().contains("extra"));
-        assertTrue(result.getExtraFields().contains("object_extra"));
+        assertTrue(result.getExtraFields().containsKey("extra"));
+        assertTrue(result.getExtraFields().containsKey("object_extra"));
     }
 }

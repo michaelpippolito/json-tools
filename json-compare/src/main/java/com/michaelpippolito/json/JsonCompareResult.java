@@ -13,8 +13,8 @@ public class JsonCompareResult {
     private final int actualCount;
     private final Set<String> matchedFields;
     private final Map<String, JsonMismatch> mismatchedFields;
-    private final Set<String> missingFields;
-    private final Set<String> extraFields;
+    private final Map<String, String> missingFields;
+    private final Map<String, String> extraFields;
 
 
     public record JsonMismatch(String expectedValue, String actualValue) {
