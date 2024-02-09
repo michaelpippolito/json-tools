@@ -22,28 +22,32 @@ public class JsonCompare {
         Map<String, String> extraFields = new LinkedHashMap<>();
 
         flattenedExpectedJson.forEach((expectedKey, expectedValue) -> {
-            if (flattenedActualJson.containsKey(expectedKey)) {
-                String actualValue = flattenedActualJson.get(expectedKey);
+            if (!ignoreFields.contains(expectedKey)) {
+                if (flattenedActualJson.containsKey(expectedKey)) {
+                    String actualValue = flattenedActualJson.get(expectedKey);
 
-                if (expectedValue == null) {
-                    if (actualValue == null) {
+                    if (expectedValue == null) {
+                        if (actualValue == null) {
+                            matchedFields.add(expectedKey);
+                        } else {
+                            mismatchedFields.put(expectedKey, new JsonMismatch(null, actualValue));
+                        }
+                    } else if (expectedValue.equals(actualValue)) {
                         matchedFields.add(expectedKey);
                     } else {
-                        mismatchedFields.put(expectedKey, new JsonMismatch(null, actualValue));
+                        mismatchedFields.put(expectedKey, new JsonMismatch(expectedValue, actualValue));
                     }
-                } else if (expectedValue.equals(actualValue)) {
-                    matchedFields.add(expectedKey);
                 } else {
-                    mismatchedFields.put(expectedKey, new JsonMismatch(expectedValue, actualValue));
+                    missingFields.put(expectedKey, expectedValue);
                 }
-            } else {
-                missingFields.put(expectedKey, expectedValue);
             }
         });
 
         flattenedActualJson.forEach((actualKey, actualValue) -> {
-            if (!matchedFields.contains(actualKey) && !mismatchedFields.containsKey(actualKey)) {
-                extraFields.put(actualKey, actualValue);
+            if (!ignoreFields.contains(actualKey)) {
+                if (!matchedFields.contains(actualKey) && !mismatchedFields.containsKey(actualKey)) {
+                    extraFields.put(actualKey, actualValue);
+                }
             }
         });
 

@@ -10,6 +10,7 @@
     2,
     null
   ],
+  "ignore": "ignore2",
   "object": {
     "boolean": true,
     "extra": "extra",

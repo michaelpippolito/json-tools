@@ -3,6 +3,7 @@ package com.michaelpippolito.json;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +24,7 @@ public class JsonCompareTest {
         String expected = new String(Objects.requireNonNull(JsonCompareTest.class.getClassLoader().getResourceAsStream("test.json")).readAllBytes());
         String actual = new String(Objects.requireNonNull(JsonCompareTest.class.getClassLoader().getResourceAsStream("testNotEquals.json")).readAllBytes());
 
-        JsonCompareResult result = JsonCompare.compareJsonStrings(expected, actual);
+        JsonCompareResult result = JsonCompare.compareJsonStrings(expected, actual, Collections.singleton("ignore"));
         assertEquals(result.getExpectedCount(), result.getActualCount());
 
         assertTrue(result.getMatchedFields().contains("null"));

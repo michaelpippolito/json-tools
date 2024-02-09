@@ -17,6 +17,5 @@ public class JsonCompareResult {
     private final Map<String, String> extraFields;
 
 
-    public record JsonMismatch(String expectedValue, String actualValue) {
-    }
+    public record JsonMismatch(String expectedValue, String actualValue) {}
 }
