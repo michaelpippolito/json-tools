@@ -21,9 +21,8 @@ public class JsonCompare {
         Set<String> missingFields = new LinkedHashSet<>();
         Set<String> extraFields = new LinkedHashSet<>();
 
-        for (String expectedKey : flattenedExpectedJson.keySet()) {
+        flattenedExpectedJson.forEach((expectedKey, expectedValue) -> {
             if (flattenedActualJson.containsKey(expectedKey)) {
-                String expectedValue = flattenedExpectedJson.get(expectedKey);
                 String actualValue = flattenedActualJson.get(expectedKey);
 
                 if (expectedValue == null) {
@@ -40,13 +39,13 @@ public class JsonCompare {
             } else {
                 missingFields.add(expectedKey);
             }
-        }
+        });
 
-        for (String actualKey : flattenedActualJson.keySet()) {
+        flattenedActualJson.keySet().forEach(actualKey -> {
             if (!matchedFields.contains(actualKey) && !mismatchedFields.containsKey(actualKey)) {
                 extraFields.add(actualKey);
             }
-        }
+        });
 
         return JsonCompareResult.builder()
                 .expectedCount(flattenedExpectedJson.size())
