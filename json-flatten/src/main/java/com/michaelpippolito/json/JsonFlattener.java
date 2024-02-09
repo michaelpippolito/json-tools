@@ -37,7 +37,7 @@ public class JsonFlattener {
         @Override
         public void accept(String fieldName) {
             JsonNode jsonField = jsonNode.get(fieldName);
-            String flattenedKey = "".equals(basePath) ? fieldName : basePath + separator + fieldName;
+            String flattenedKey = DEFAULT_BASE_PATH.equals(basePath) ? fieldName : basePath + separator + fieldName;
             acceptField(flattenedKey, jsonField);
         }
 
