@@ -1,12 +1,14 @@
 package com.michaelpippolito.json;
 
+import com.michaelpippolito.json.JsonCompareResult.BasicJsonMatch;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JsonCompareTest {
     @Test
@@ -27,18 +29,18 @@ public class JsonCompareTest {
         JsonCompareResult result = JsonCompare.compareJsonStrings(expected, actual, Collections.singleton("ignore"));
         assertEquals(result.getExpectedCount(), result.getActualCount());
 
-        assertTrue(result.getMatchedFields().contains("null"));
-        assertTrue(result.getMatchedFields().contains("emptyArray"));
-        assertTrue(result.getMatchedFields().contains("primitiveArray[0]"));
-        assertTrue(result.getMatchedFields().contains("primitiveArray[1]"));
-        assertTrue(result.getMatchedFields().contains("primitiveArray[3]"));
-        assertTrue(result.getMatchedFields().contains("object_boolean"));
-        assertTrue(result.getMatchedFields().contains("object_null"));
-        assertTrue(result.getMatchedFields().contains("object_emptyArray"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray[0]"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray[1]"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray[2]"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray[3]"));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("null", null)));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("emptyArray", "EMPTY_ARRAY")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("primitiveArray[0]", "string")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("primitiveArray[1]", "true")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("primitiveArray[3]", null)));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_boolean", "true")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_null", null)));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_emptyArray", "EMPTY_ARRAY")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_primitiveArray[0]", "string")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_primitiveArray[1]", "true")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_primitiveArray[2]", "1")));
+        assertTrue(result.getMatchedFields().contains(new BasicJsonMatch("object_primitiveArray[3]", null)));
 
         assertTrue(result.getMismatchedFields().containsKey("string"));
         assertEquals("string", result.getMismatchedFields().get("string").expectedValue());
