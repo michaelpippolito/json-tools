@@ -64,7 +64,7 @@ public class JsonCompare {
 
         flattenedActualJson.forEach((actualKey, actualValue) -> {
             if (!ignoreFields.contains(actualKey)) {
-                if (!matchedFields.contains(new BasicJsonMatch(actualKey, actualValue)) && !mismatchedFields.containsKey(actualKey)) {
+                if (!isArrayField(actualKey) && ignoreArrayOrder && !matchedFields.contains(new BasicJsonMatch(actualKey, actualValue)) && !mismatchedFields.containsKey(actualKey)) {
                     extraFields.put(actualKey, actualValue);
                 }
             }
@@ -85,61 +85,61 @@ public class JsonCompare {
     }
 
     private static void compareArrayFieldIgnoreOrder(String arrayKey, Map<String, String> flattenedExpectedJson, Map<String, String> flattenedActualJson, Set<JsonMatch> matchedFields, Map<String, String> missingFields) {
-        Matcher matcher = Pattern.compile(ARRAY_FIELD_REGEX).matcher(arrayKey);
+        if (matchedFields.stream().noneMatch(match -> match instanceof ArrayJsonMatch toCompare && toCompare.expectedKey().equals(arrayKey)) && !missingFields.containsKey(arrayKey)) {
+            StringBuilder expectedPrefixBuilder = new StringBuilder();
+            StringBuilder actualRegexBuilder = new StringBuilder();
+            AtomicInteger lastIndex = new AtomicInteger();
+            Pattern.compile(ARRAY_FIELD_REGEX).matcher(arrayKey).results().forEach(match -> {
+                expectedPrefixBuilder.append(arrayKey, lastIndex.get(), match.end());
+                actualRegexBuilder.append(arrayKey, lastIndex.get(), match.start());
+                actualRegexBuilder.append(ARRAY_FIELD_REGEX);
+                lastIndex.set(match.end());
+            });
 
-        StringBuilder expectedPrefixBuilder = new StringBuilder();
-        StringBuilder actualRegexBuilder = new StringBuilder();
-        AtomicInteger lastIndex = new AtomicInteger();
-        matcher.results().forEach(match -> {
-            expectedPrefixBuilder.append(arrayKey, lastIndex.get(), match.end());
-            actualRegexBuilder.append(arrayKey, lastIndex.get(), match.start());
-            actualRegexBuilder.append(ARRAY_FIELD_REGEX);
-            lastIndex.set(match.end());
-        });
-
-        Map<String, KVWrapper> expectedArrayFields = flattenedExpectedJson.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(expectedPrefixBuilder.toString()))
-                .collect(Collectors.toMap(entry -> entry.getKey().replaceAll(ARRAY_FIELD_REGEX, ""), entry -> new KVWrapper(entry.getKey(), entry.getValue())));
-        Map<String, String> actualArrayFields = flattenedActualJson.entrySet().stream()
-                .filter(entry -> entry.getKey().matches(actualRegexBuilder.toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Map<String, KVWrapper> expectedArrayFields = flattenedExpectedJson.entrySet().stream()
+                    .filter(entry -> entry.getKey().startsWith(expectedPrefixBuilder.toString()))
+                    .collect(Collectors.toMap(entry -> entry.getKey().replaceAll(ARRAY_FIELD_REGEX, ""), entry -> new KVWrapper(entry.getKey(), entry.getValue())));
+            Map<String, String> actualArrayFields = flattenedActualJson.entrySet().stream()
+                    .filter(entry -> Pattern.compile(actualRegexBuilder.toString()).matcher(entry.getKey()).find())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        Set<String> checkedKeys = new HashSet<>();
-        boolean matched = false;
-        for (String actualKey : actualArrayFields.keySet()) {
-            if (!checkedKeys.contains(actualKey) && matchedFields.stream().noneMatch(match -> match instanceof ArrayJsonMatch toCompare && toCompare.actualKey().equals(actualKey))) {
-                Map<String, KVWrapper> actualArrayFieldGroup = actualArrayFields.entrySet().stream()
-                        .filter(entry -> entry.getKey().startsWith(actualKey.substring(0, actualKey.lastIndexOf("]"))))
-                        .collect(Collectors.toMap(entry -> entry.getKey().replaceAll(ARRAY_FIELD_REGEX, ""), entry -> new KVWrapper(entry.getKey(), entry.getValue())));
-                checkedKeys.addAll(actualArrayFieldGroup.values().stream().map(KVWrapper::key).collect(Collectors.toSet()));
+            Set<String> checkedKeys = new HashSet<>();
+            boolean matched = false;
+            for (String actualKey : actualArrayFields.keySet()) {
+                if (!checkedKeys.contains(actualKey) && matchedFields.stream().noneMatch(match -> match instanceof ArrayJsonMatch toCompare && toCompare.actualKey().equals(actualKey))) {
+                    Map<String, KVWrapper> actualArrayFieldGroup = actualArrayFields.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(actualKey.substring(0, actualKey.lastIndexOf("]"))))
+                            .collect(Collectors.toMap(entry -> entry.getKey().replaceAll(ARRAY_FIELD_REGEX, ""), entry -> new KVWrapper(entry.getKey(), entry.getValue())));
+                    checkedKeys.addAll(actualArrayFieldGroup.values().stream().map(KVWrapper::key).collect(Collectors.toSet()));
 
-                if (actualArrayFieldGroup.size() == expectedArrayFields.size()) {
-                    boolean fullyMatched = true;
-                    for (String expectedKey : expectedArrayFields.keySet()) {
-                        if (!actualArrayFieldGroup.containsKey(expectedKey) || !expectedArrayFields.get(expectedKey).value().equals(actualArrayFieldGroup.get(expectedKey).value())) {
-                            fullyMatched = false;
+                    if (actualArrayFieldGroup.size() == expectedArrayFields.size()) {
+                        boolean fullyMatched = true;
+                        for (String expectedKey : expectedArrayFields.keySet()) {
+                            if (!actualArrayFieldGroup.containsKey(expectedKey) || !expectedArrayFields.get(expectedKey).value().equals(actualArrayFieldGroup.get(expectedKey).value())) {
+                                fullyMatched = false;
+                                break;
+                            }
+                        }
+                        if (fullyMatched) {
+                            for (String key : expectedArrayFields.keySet()) {
+                                matchedFields.add(new ArrayJsonMatch(
+                                        expectedArrayFields.get(key).key(),
+                                        actualArrayFieldGroup.get(key).key(),
+                                        expectedArrayFields.get(key).value()
+                                ));
+                            }
+                            matched = true;
                             break;
                         }
                     }
-                    if (fullyMatched) {
-                        for (String key : expectedArrayFields.keySet()) {
-                            matchedFields.add(new ArrayJsonMatch(
-                                    expectedArrayFields.get(key).key(),
-                                    actualArrayFieldGroup.get(key).key(),
-                                    expectedArrayFields.get(key).value()
-                            ));
-                        }
-                        matched = true;
-                        break;
-                    }
                 }
             }
-        }
 
-        if (!matched) {
-            for (String key : expectedArrayFields.keySet()) {
-                missingFields.put(expectedArrayFields.get(key).key(), expectedArrayFields.get(key).value());
+            if (!matched) {
+                for (String key : expectedArrayFields.keySet()) {
+                    missingFields.put(expectedArrayFields.get(key).key(), expectedArrayFields.get(key).value());
+                }
             }
         }
     }

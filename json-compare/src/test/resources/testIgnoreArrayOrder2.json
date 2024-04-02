@@ -1,0 +1,17 @@
+{
+  "primitiveArray": [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+  "objectArray": [
+    {
+      "string": "string3"
+    },
+    {
+      "string": "string2"
+    },
+    {
+      "string": "string1"
+    },
+    {
+      "string": "string0"
+    }
+  ]
+}

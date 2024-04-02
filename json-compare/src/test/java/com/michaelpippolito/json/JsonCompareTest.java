@@ -67,6 +67,9 @@ public class JsonCompareTest {
         String expected =  new String(Objects.requireNonNull(JsonCompareTest.class.getClassLoader().getResourceAsStream("testIgnoreArrayOrder1.json")).readAllBytes());
         String actual =  new String(Objects.requireNonNull(JsonCompareTest.class.getClassLoader().getResourceAsStream("testIgnoreArrayOrder2.json")).readAllBytes());
         JsonCompareResult result = JsonCompare.compareJsonStrings(expected, actual, true);
-        assertEquals(10, result.getMatchedFields().size());
+        assertEquals(14, result.getMatchedFields().size());
+        assertEquals(0, result.getMismatchedFields().size());
+        assertEquals(0, result.getMissingFields().size());
+        assertEquals(0, result.getExtraFields().size());
     }
 }
