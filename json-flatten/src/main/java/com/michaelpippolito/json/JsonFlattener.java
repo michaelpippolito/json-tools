@@ -41,18 +41,6 @@ public class JsonFlattener {
             acceptField(flattenedKey, jsonField);
         }
 
-        private void acceptArrayField(String flattenedKey, ArrayNode arrayField) {
-            if (arrayField.size() == 0) {
-                flattenedJson.put(flattenedKey, EMPTY_ARRAY);
-            } else {
-                for (int index = 0; index < arrayField.size(); index++) {
-                    JsonNode arrayEntry = arrayField.get(index);
-                    String arrayEntryKey = flattenedKey + separator + index;
-                    acceptField(arrayEntryKey, arrayEntry);
-                }
-            }
-        }
-
         private void acceptField(String key, JsonNode field) {
             switch (field.getNodeType()) {
                 case ARRAY -> acceptArrayField(key, (ArrayNode) field);
@@ -61,6 +49,18 @@ public class JsonFlattener {
                 case BINARY, STRING -> flattenedJson.put(key, field.textValue());
                 case BOOLEAN -> flattenedJson.put(key, String.valueOf(field.booleanValue()));
                 case NUMBER -> flattenedJson.put(key, field.numberValue().toString());
+            }
+        }
+
+        private void acceptArrayField(String flattenedKey, ArrayNode arrayField) {
+            if (arrayField.size() == 0) {
+                flattenedJson.put(flattenedKey, EMPTY_ARRAY);
+            } else {
+                for (int index = 0; index < arrayField.size(); index++) {
+                    JsonNode arrayEntry = arrayField.get(index);
+                    String arrayEntryKey = String.format("%s[%d]", flattenedKey, index);
+                    acceptField(arrayEntryKey, arrayEntry);
+                }
             }
         }
     }

@@ -29,16 +29,16 @@ public class JsonCompareTest {
 
         assertTrue(result.getMatchedFields().contains("null"));
         assertTrue(result.getMatchedFields().contains("emptyArray"));
-        assertTrue(result.getMatchedFields().contains("primitiveArray_0"));
-        assertTrue(result.getMatchedFields().contains("primitiveArray_1"));
-        assertTrue(result.getMatchedFields().contains("primitiveArray_3"));
+        assertTrue(result.getMatchedFields().contains("primitiveArray[0]"));
+        assertTrue(result.getMatchedFields().contains("primitiveArray[1]"));
+        assertTrue(result.getMatchedFields().contains("primitiveArray[3]"));
         assertTrue(result.getMatchedFields().contains("object_boolean"));
         assertTrue(result.getMatchedFields().contains("object_null"));
         assertTrue(result.getMatchedFields().contains("object_emptyArray"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray_0"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray_1"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray_2"));
-        assertTrue(result.getMatchedFields().contains("object_primitiveArray_3"));
+        assertTrue(result.getMatchedFields().contains("object_primitiveArray[0]"));
+        assertTrue(result.getMatchedFields().contains("object_primitiveArray[1]"));
+        assertTrue(result.getMatchedFields().contains("object_primitiveArray[2]"));
+        assertTrue(result.getMatchedFields().contains("object_primitiveArray[3]"));
 
         assertTrue(result.getMismatchedFields().containsKey("string"));
         assertEquals("string", result.getMismatchedFields().get("string").expectedValue());
@@ -46,9 +46,9 @@ public class JsonCompareTest {
         assertTrue(result.getMismatchedFields().containsKey("boolean"));
         assertEquals("true", result.getMismatchedFields().get("boolean").expectedValue());
         assertEquals("false", result.getMismatchedFields().get("boolean").actualValue());
-        assertTrue(result.getMismatchedFields().containsKey("primitiveArray_2"));
-        assertEquals("1", result.getMismatchedFields().get("primitiveArray_2").expectedValue());
-        assertEquals("2", result.getMismatchedFields().get("primitiveArray_2").actualValue());
+        assertTrue(result.getMismatchedFields().containsKey("primitiveArray[2]"));
+        assertEquals("1", result.getMismatchedFields().get("primitiveArray[2]").expectedValue());
+        assertEquals("2", result.getMismatchedFields().get("primitiveArray[2]").actualValue());
         assertTrue(result.getMismatchedFields().containsKey("object_number"));
         assertEquals("1", result.getMismatchedFields().get("object_number").expectedValue());
         assertEquals("2", result.getMismatchedFields().get("object_number").actualValue());
