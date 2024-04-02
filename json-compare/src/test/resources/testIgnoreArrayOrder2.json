@@ -13,5 +13,29 @@
     {
       "string": "string0"
     }
+  ],
+  "nestedArrays": [
+    {
+      "object2": [
+        {
+          "id1": "string6",
+          "id2": "string7"
+        },
+        {
+          "id1": "string4",
+          "id2": "string5"
+        }
+      ],
+      "object1": [
+        {
+          "id1": "string2",
+          "id2": "string3"
+        },
+        {
+          "id1": "string0",
+          "id2": "string1"
+        }
+      ]
+    }
   ]
 }
