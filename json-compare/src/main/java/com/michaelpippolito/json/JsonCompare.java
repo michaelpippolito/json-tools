@@ -14,14 +14,19 @@ import java.util.stream.Collectors;
 
 public class JsonCompare {
     private static final Set<String> DEFAULT_IGNORE_FIELDS = Collections.emptySet();
+    private static final boolean DEFAULT_IGNORE_ARRAY_ORDER = false;
     private static final String ARRAY_FIELD_REGEX = "\\[\\d+]";
 
     public static JsonCompareResult compareJsonStrings(String expectedJson, String actualJson) throws JsonProcessingException {
-        return compareJsonStrings(expectedJson, actualJson, DEFAULT_IGNORE_FIELDS);
+        return compareJsonStrings(expectedJson, actualJson, DEFAULT_IGNORE_FIELDS, DEFAULT_IGNORE_ARRAY_ORDER);
+    }
+
+    public static JsonCompareResult compareJsonStrings(String expectedJson, String actualJson, boolean ignoreArrayOrder) throws JsonProcessingException {
+        return compareJsonStrings(expectedJson, actualJson, DEFAULT_IGNORE_FIELDS, ignoreArrayOrder);
     }
 
     public static JsonCompareResult compareJsonStrings(String expectedJson, String actualJson, Set<String> ignoreFields) throws JsonProcessingException {
-        return compareJsonStrings(expectedJson, actualJson, ignoreFields, false);
+        return compareJsonStrings(expectedJson, actualJson, ignoreFields, DEFAULT_IGNORE_ARRAY_ORDER);
     }
 
     public static JsonCompareResult compareJsonStrings(String expectedJson, String actualJson, Set<String> ignoreFields, boolean ignoreArrayOrder) throws JsonProcessingException {
@@ -76,7 +81,7 @@ public class JsonCompare {
     }
 
     private static boolean isArrayField(String expectedKey) {
-        return expectedKey.matches(ARRAY_FIELD_REGEX);
+        return Pattern.compile(ARRAY_FIELD_REGEX).matcher(expectedKey).find();
     }
 
     private static void compareArrayFieldIgnoreOrder(String arrayKey, Map<String, String> flattenedExpectedJson, Map<String, String> flattenedActualJson, Set<JsonMatch> matchedFields, Map<String, String> missingFields) {
@@ -100,16 +105,14 @@ public class JsonCompare {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        Set<String> usedKeys = new HashSet<>();
+        Set<String> checkedKeys = new HashSet<>();
         boolean matched = false;
         for (String actualKey : actualArrayFields.keySet()) {
-            if (!usedKeys.contains(actualKey) && matchedFields.stream().noneMatch(match -> match instanceof ArrayJsonMatch toCompare && toCompare.actualKey().equals(actualKey))) {
+            if (!checkedKeys.contains(actualKey) && matchedFields.stream().noneMatch(match -> match instanceof ArrayJsonMatch toCompare && toCompare.actualKey().equals(actualKey))) {
                 Map<String, KVWrapper> actualArrayFieldGroup = actualArrayFields.entrySet().stream()
                         .filter(entry -> entry.getKey().startsWith(actualKey.substring(0, actualKey.lastIndexOf("]"))))
                         .collect(Collectors.toMap(entry -> entry.getKey().replaceAll(ARRAY_FIELD_REGEX, ""), entry -> new KVWrapper(entry.getKey(), entry.getValue())));
-                usedKeys.addAll(actualArrayFieldGroup.keySet().stream()
-                        .filter(s -> s.startsWith(actualKey.substring(0, actualKey.lastIndexOf("]"))))
-                        .collect(Collectors.toSet()));
+                checkedKeys.addAll(actualArrayFieldGroup.values().stream().map(KVWrapper::key).collect(Collectors.toSet()));
 
                 if (actualArrayFieldGroup.size() == expectedArrayFields.size()) {
                     boolean fullyMatched = true;

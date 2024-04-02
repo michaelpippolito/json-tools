@@ -61,4 +61,12 @@ public class JsonCompareTest {
         assertTrue(result.getExtraFields().containsKey("extra"));
         assertTrue(result.getExtraFields().containsKey("object_extra"));
     }
+
+    @Test
+    public void testIgnoreArrayOrder() throws IOException {
+        String expected =  new String(Objects.requireNonNull(JsonCompareTest.class.getClassLoader().getResourceAsStream("testIgnoreArrayOrder1.json")).readAllBytes());
+        String actual =  new String(Objects.requireNonNull(JsonCompareTest.class.getClassLoader().getResourceAsStream("testIgnoreArrayOrder2.json")).readAllBytes());
+        JsonCompareResult result = JsonCompare.compareJsonStrings(expected, actual, true);
+        assertEquals(10, result.getMatchedFields().size());
+    }
 }

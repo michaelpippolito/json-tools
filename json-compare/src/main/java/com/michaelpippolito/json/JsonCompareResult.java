@@ -57,7 +57,7 @@ public class JsonCompareResult {
 
         @Override
         public int hashCode() {
-            int result = 17; // Initial value
+            int result = 19; // Initial value
             result = 31 * result + this.expectedKey.hashCode();
             result = 31 * result + this.actualKey.hashCode();
             if (this.value != null) {
