@@ -64,8 +64,10 @@ public class JsonCompare {
 
         flattenedActualJson.forEach((actualKey, actualValue) -> {
             if (!ignoreFields.contains(actualKey)) {
-                if (!isArrayField(actualKey) && ignoreArrayOrder && !matchedFields.contains(new BasicJsonMatch(actualKey, actualValue)) && !mismatchedFields.containsKey(actualKey)) {
-                    extraFields.put(actualKey, actualValue);
+                if (!isArrayField(actualKey) || !ignoreArrayOrder) {
+                    if (!matchedFields.contains(new BasicJsonMatch(actualKey, actualValue)) && !mismatchedFields.containsKey(actualKey)) {
+                        extraFields.put(actualKey, actualValue);
+                    }
                 }
             }
         });
